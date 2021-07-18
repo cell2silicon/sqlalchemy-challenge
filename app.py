@@ -1,3 +1,5 @@
+# Importing dependencies
+
 import numpy as np
 import pandas as pd
 import datetime as dt
@@ -31,6 +33,7 @@ app = Flask(__name__)
 #################################################
 # Flask Routes
 #################################################
+# App home page with all the available routes
 @app.route("/")
 def welcome():
     return(
@@ -42,7 +45,7 @@ def welcome():
         f"/api/v1.0/temp/start<br/>"
         f"/api/v1.0/temp/start/end"
     )
-
+# App route for  percipitation 
 @app.route("/api/v1.0/precipitation")
 def percipitation():
     
@@ -51,26 +54,26 @@ def percipitation():
     perc = {date: prcp for date, prcp in percipitation}
     return jsonify(perc)    
 
-
+# App route for all the stations
 @app.route("/api/v1.0/stations")
 def station():
     station = session.query(Station.name).all()
     return jsonify(station)
 
-
+# App route for temperature values
 @app.route("/api/v1.0/tobs")
 def tobs():
     last_year = dt.date(2017, 8, 23) - dt.timedelta(days=365)
     tobs = session.query(Measurement.date,Measurement.tobs).filter(Measurement.date >= last_year).filter(Measurement.station == "USC00519281").all()
     return jsonify(tobs)
 
-
+# App route for minimum, maximum and average temperature value for specific date
 @app.route("/api/v1.0/temp/<start>")
 def temp_start(start):
     temp = session.query(func.min(Measurement.tobs),func.max(Measurement.tobs),func.avg(Measurement.tobs)).filter(Measurement.date >= start).all()
     return jsonify(temp[0])
 
-
+# App route for minimum, maximum and average temperature value in between specific dates
 @app.route("/api/v1.0/temp/<start>/<end>")
 def temp_end(start,end):
     temp = session.query(func.min(Measurement.tobs),func.max(Measurement.tobs),func.avg(Measurement.tobs)).filter(Measurement.date >= start).filter(Measurement.date <= end).all()
